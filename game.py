@@ -1,6 +1,6 @@
 
 from board import GameBoard
-from board_renderer import GameBoardRenderer
+from board_renderer import ConsoleRenderer
 from player_manager import PlayerManager
 from game_rule import GameRule
 from game_mode import GameMode
@@ -25,19 +25,19 @@ class Game:
                     self.board.set_mark(row, column, player.get_mark())
                 else:
                     raise ValueError("The position is already marked. Please choose an empty cell.")
-                GameBoardRenderer(self.board).render()
-                if GameRule.is_over(self.board):
+                ConsoleRenderer(self.board).render()
+                if GameRule().is_over(self.board):
                     break
                 self.player_manager.move_to_next_player()
                 
             except ValueError or IndexError as e:
                 print(str(e))
                 continue
-            except Exception as e:
-                print(f"Unexpected Error {e}")
-                exit(1)
+            #except Exception as e:
+            #    print(f"Unexpected Error {e}")
+            #    exit(1)
 
-        if GameRule.has_winner(self.board): 
+        if GameRule().has_winner(self.board): 
             print(f"{player.name} win")
             return
         elif GameRule.is_draw(self.board):
@@ -46,7 +46,7 @@ class Game:
 
     def display_initial_text(self):
         print("TicTacToe Game START!\n")
-        GameBoardRenderer(self.board).render()
+        ConsoleRenderer(self.board).render()
 
     def select_mode(self) -> GameMode:
         while True:

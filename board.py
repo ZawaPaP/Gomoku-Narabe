@@ -6,8 +6,8 @@ class BoardCell:
         self.mark = GameMark.EMPTY.value
 
 class GameBoard:
-    ROW = 3
-    COLUMN = 3
+    ROW = 5
+    COLUMN = 5
 
     def __init__(self) -> None:
         self.board = [[BoardCell() for _ in range(self.column())] for _ in range(self.row())]
