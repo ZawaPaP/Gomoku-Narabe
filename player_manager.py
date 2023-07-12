@@ -1,4 +1,4 @@
-from player import Player, PlayerType
+from player import Player, CPUPlayer, UserPlayer, PlayerType
 from io_controller import IOController
 from game_mark import GameMark
 from game_mode import GameMode
@@ -12,14 +12,18 @@ class PlayerManager:
         self.number_of_user, self.number_of_cpu = GameMode.get_player_counts(game_mode)
         self.number_of_players = self.number_of_cpu + self.number_of_user
         self.get_current_player_index = 0
-    
+
     def set_players(self) -> List[Player]:
-        for i in range(self.number_of_user):        
-            player = self.create_player(i, PlayerType.USER)
+        for i in range(self.number_of_user):   
+            name = f"{PlayerType.USER.name}_{i + 1}"
+            mark = self.get_available_mark()     
+            player = UserPlayer(name, mark)
             self.players.append(player)
         
         for i in range(self.number_of_cpu):
-            player = self.create_player(i, PlayerType.CPU)
+            name = f"{PlayerType.CPU.name}_{i + 1}"
+            mark = self.get_available_mark()     
+            player = CPUPlayer(name, mark)
             self.players.append(player)
 
         if self.game_mode == GameMode.PVC:
@@ -32,10 +36,6 @@ class PlayerManager:
     def move_to_next_player(self):
         self.get_current_player_index += 1
 
-    def create_player(self, index, player_type: PlayerType) -> Player:
-        name = f"{player_type.name}_{index + 1}"
-        mark = self.get_available_mark()
-        return Player(name, mark, player_type)
 
     def get_available_mark(self) -> str:
         try:

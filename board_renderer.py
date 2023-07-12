@@ -1,8 +1,10 @@
-class GameBoardRenderer:
+class Renderer:
     def __init__(self, board) -> None:
         self.board = board
-        
-
+    
+    def render(self) -> None:
+        raise NotImplementedError()
+class ConsoleRenderer(Renderer):
     def render(self) -> None:
         for i in self.board.row_range():
             for j in self.board.column_range():

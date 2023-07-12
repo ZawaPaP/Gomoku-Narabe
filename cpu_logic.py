@@ -1,10 +1,11 @@
 import random
 from typing import Tuple, List
-
+from min_max import MinMax
 class CPUStrategy:
-
+    # use inheritance 
     def generate_cpu_move(board, mark: str, opponent_marks: List[str]) -> Tuple[int, int]:
-        return CPUStrategy.generate_high_level_cpu_move(board, mark, opponent_marks)
+        #return CPUStrategy.generate_high_level_cpu_move(board, mark, opponent_marks)
+        return CPUStrategy.get_min_max_move(board, mark)
     
     @staticmethod
     def generate_low_level_cpu_move(board) -> Tuple[int, int]:
@@ -30,5 +31,12 @@ class CPUStrategy:
         if board.get_empty_corner() is not None:
             return board.get_empty_corner()
         #空いている場所をランダム取得
+        else:
+            return CPUStrategy.generate_low_level_cpu_move(board)
+
+    def get_min_max_move(board, mark) -> Tuple[int, int]:
+        min_max_move = MinMax().min_max(board, mark)
+        if min_max_move:
+            return min_max_move
         else:
             return CPUStrategy.generate_low_level_cpu_move(board)
