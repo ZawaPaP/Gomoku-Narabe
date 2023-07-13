@@ -25,8 +25,8 @@ class Game:
                     self.board.set_mark(row, column, player.get_mark())
                 else:
                     raise ValueError("The position is already marked. Please choose an empty cell.")
-                ConsoleRenderer(self.board).render()
-                if GameRule().is_over(self.board):
+                ConsoleRenderer.render(self.board)
+                if GameRule().is_over(self.board, row, column, player):
                     break
                 self.player_manager.move_to_next_player()
                 
@@ -46,7 +46,7 @@ class Game:
 
     def display_initial_text(self):
         print("TicTacToe Game START!\n")
-        ConsoleRenderer(self.board).render()
+        ConsoleRenderer.render(self.board)
 
     def select_mode(self) -> GameMode:
         while True:
