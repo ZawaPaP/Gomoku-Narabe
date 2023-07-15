@@ -37,7 +37,12 @@ class Game:
             #    print(f"Unexpected Error {e}")
             #    exit(1)
 
-        if GameRule().has_winner(self.board): 
+        if GameRule().is_prohibited_move(self.board, row, column, player): 
+            self.player_manager.move_to_next_player()
+            player = self.player_manager.get_current_player()
+            print(f"This is prohibited move. {player.name} win")
+            return
+        elif GameRule().has_winner(self.board, row, column): 
             print(f"{player.name} win")
             return
         elif GameRule.is_draw(self.board):

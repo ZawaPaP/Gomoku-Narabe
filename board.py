@@ -87,8 +87,35 @@ class GameBoard:
     def get_column_marks(self, column: int) -> list:
         return [mark for mark in [self.get_mark(row, column) for row in self.row_range()]]
 
-    def get_left_to_right_cross_marks(self) -> list:
-        return [self.get_mark(row, row) for row in self.row_range()]
+    def get_left_to_right_cross_marks(self, row: int, column: int) -> list:
+        marks = []
+        # - 1 due to the board starts from 1
+        _distance_to_top_left_cell = min(row - 1, column - 1)
 
-    def get_right_to_left_cross_marks(self) -> list:
-        return [self.get_mark(row, self.row() + 1 - row) for row in self.row_range()]
+        row -= _distance_to_top_left_cell
+        column -= _distance_to_top_left_cell    
+        while row in self.row_range() and column in self.column_range():
+            marks.append(self.get_mark(row, column))
+            row += 1
+            column += 1
+        return marks
+    
+    def get_right_to_left_cross_marks(self, row: int, column: int) -> list:
+        marks = []
+        # - 1 due to the board starts from 1
+        _distance_to_top_right_edge = min(row - 1, self.column() - column) 
+
+        row -= _distance_to_top_right_edge
+        column += _distance_to_top_right_edge        
+        while row in self.row_range() and column in self.column_range():
+            marks.append(self.get_mark(row, column))
+            row += 1
+            column -= 1
+        return marks
+
+    def has_empty(window) -> bool:
+        for i in window:
+            if i == GameMark.EMPTY.value:
+                return True
+        return False
+    

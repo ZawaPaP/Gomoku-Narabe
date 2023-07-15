@@ -11,7 +11,6 @@ class Renderer:
 class ConsoleRenderer(Renderer):
     def render(board) -> None:
         row_index = ConsoleRenderer.get_row_number_list(board)
-        column_index = ConsoleRenderer.get_column_number_list(board)
         
         for i in board.row_range():
             if i == 1:

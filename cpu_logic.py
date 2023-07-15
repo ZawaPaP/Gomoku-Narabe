@@ -4,7 +4,7 @@ from typing import Tuple, List
 class CPUStrategy:
 
     def generate_cpu_move(board, mark: str, opponent_marks: List[str]) -> Tuple[int, int]:
-        return CPUStrategy.generate_high_level_cpu_move(board, mark, opponent_marks)
+        return CPUStrategy.generate_low_level_cpu_move(board)
     
     @staticmethod
     def generate_low_level_cpu_move(board) -> Tuple[int, int]:

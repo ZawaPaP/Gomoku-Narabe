@@ -29,6 +29,9 @@ class PlayerManager:
         if self.game_mode == GameMode.PVC:
             if self.make_cpu_first_player():
                 self.players.reverse()
+        
+        for player in self.players:
+            player.play_order = self.players.index(player) + 1
 
     def get_current_player(self) -> Player:
         return self.players[self.get_current_player_index % self.number_of_players]

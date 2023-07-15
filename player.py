@@ -11,6 +11,7 @@ class Player:
     def __init__(self, name, mark) -> None:
         self.name = name
         self.mark = mark
+        self.play_order = None
         self.player_type = None
 
     def make_move(self, board) -> None:
@@ -37,6 +38,9 @@ class Player:
 
     def get_mark(self):
         return self.mark
+
+    def get_play_order(self):
+        return self.play_order
 
 class CPUPlayer(Player):
     def __init__(self, name, mark) -> None:
