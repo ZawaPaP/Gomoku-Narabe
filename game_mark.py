@@ -2,8 +2,8 @@ from typing import List
 from enum import Enum
 class GameMark(Enum):
     EMPTY = ' '
-    FIRST_USER = 'o'
-    SECOND_USER = 'x'
+    BLACK = 'x'
+    WHITE = 'o'
 
     @classmethod
     def get_game_marks(cls) -> List[str]:

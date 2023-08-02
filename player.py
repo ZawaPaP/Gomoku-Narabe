@@ -1,7 +1,9 @@
+from error import NotEmptyCoordinateError
 from enum import Enum
 from game_mark import GameMark
+from board import GameBoard, Coordinate
 from io_controller import IOController
-from cpu_logic import CPUStrategy
+from cpu_logic import DumbCPULogic
 from typing import Tuple, List
 class PlayerType(Enum):
     USER = 1
@@ -11,50 +13,55 @@ class Player:
     def __init__(self, name, mark) -> None:
         self.name = name
         self.mark = mark
-        self.play_order = None
+        self.order = None
         self.player_type = None
 
-    def make_move(self, board) -> None:
-        row, column = self.get_mark_position(board)
-        if board.is_empty(row, column):
-            board.set_mark(row, column, self.mark)
+    def make_move(self, board: GameBoard) -> None:
+        coordinate = self.get_mark_coordinate(board)
+        if board.is_empty(coordinate.row, coordinate.column):
+            board.set_mark(coordinate, self.get_mark)
         else:
-            raise ValueError("The position is already marked. Please choose an empty cell.")
+            raise NotEmptyCoordinateError()
 
-    def get_mark_position(self, board) -> Tuple[int, int]:
+    def get_mark_coordinate(self, board) -> Tuple[int, int]:
         raise NotImplementedError()
 
-
-    def get_opponent_mark(self) -> List[str]:
+    def get_opponent_mark(self) -> GameMark:
         game_marks = GameMark.get_game_marks()
         game_marks.remove(self.get_mark())
-        return game_marks
+        return game_marks[0]
 
-    def get_type(self):
+    def player_type(self) -> PlayerType:
         return self.player_type
 
-    def get_name(self):
+    def get_name(self) -> str:
         return self.name
 
-    def get_mark(self):
+    def get_mark(self) -> GameMark:
         return self.mark
 
-    def get_play_order(self):
-        return self.play_order
+    def play_order(self) -> int:
+        return self.order
+    
+    def is_first_player(self):
+        # 1 or Stringというのは必ずメモリロケーションがあるため、イコールを使う。
+        # #Noneがあるの場合のみ is / is notをつかう                
+        if self.play_order() == 1:
+            return True
+        return False
 
 class CPUPlayer(Player):
     def __init__(self, name, mark) -> None:
         super().__init__(name, mark)
         self.player_type = PlayerType.CPU
     
-    def get_mark_position(self, board) -> Tuple[int, int]:
-        return CPUStrategy.generate_cpu_move(board, self.mark, self.get_opponent_mark())
+    def get_mark_coordinate(self, board: GameBoard) -> Coordinate:
+        return DumbCPULogic(self).generate_move(board)
 
 class UserPlayer(Player):
     def __init__(self, name, mark) -> None:
         super().__init__(name, mark)
         self.player_type = PlayerType.USER
     
-    
-    def get_mark_position(self, board) -> Tuple[int, int]:
-        return IOController.get_position_input(board, "Mark (row, column): ")
+    def get_mark_coordinate(self) -> Coordinate:
+        return IOController.get_coordinate_input("Mark (row, column): ")
