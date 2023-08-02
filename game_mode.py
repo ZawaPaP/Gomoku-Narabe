@@ -6,7 +6,7 @@ class GameMode(Enum):
     CVC = 3
 
     @classmethod
-    def get_player_counts(cls, game_mode: "GameMode") -> Tuple["number_of_user":int, "number_of_cpu": int]:
+    def get_player_counts(cls, game_mode: "GameMode") -> Tuple[int, int]:
         if game_mode == cls.CVC:
             return 0, 2  # 0 players, 2 CPUs
         elif game_mode == cls.PVC:

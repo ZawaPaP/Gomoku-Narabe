@@ -1,6 +1,6 @@
-
-from board import GameBoard
-from board_renderer import GameBoardRenderer
+from error import NotEmptyCoordinateError
+from board import GameBoard, Coordinate
+from board_renderer import ConsoleRenderer
 from player_manager import PlayerManager
 from game_rule import GameRule
 from game_mode import GameMode
@@ -18,35 +18,47 @@ class Game:
         while True:
             try:
                 player = self.player_manager.get_current_player()
-                print(f"{player.get_name()}'s turn\n")
+                #print(f"{player.name}'s turn\n")
                 #player.make_move(self.board) 
-                row, column = player.get_mark_position(self.board)
-                if self.board.is_empty(row, column):
-                    self.board.set_mark(row, column, player.get_mark())
+                coordinate = player.get_mark_coordinate(self.board)
+                if self.board.is_empty(coordinate.row, coordinate.column):
+                    self.board.set_mark(coordinate, player.mark)
                 else:
-                    raise ValueError("The position is already marked. Please choose an empty cell.")
-                GameBoardRenderer(self.board).render()
-                if GameRule.is_over(self.board):
+                    raise NotEmptyCoordinateError()
+                ConsoleRenderer.render(self.board)
+                if GameRule().is_over(self.board, coordinate, player):
                     break
                 self.player_manager.move_to_next_player()
                 
             except ValueError or IndexError as e:
                 print(str(e))
                 continue
-            except Exception as e:
-                print(f"Unexpected Error {e}")
-                exit(1)
 
-        if GameRule.has_winner(self.board): 
-            print(f"{player.name} win")
+        if GameRule()._is_over_line(self.board, coordinate, player): 
+            self.player_manager.move_to_next_player()
+            player = self.player_manager.get_current_player()
+            print(f"{player.get_name()} win")
             return
-        elif GameRule.is_draw(self.board):
-            print("draw game")
+        if GameRule().has_winner(self.board, coordinate): 
+            print(f"{player.get_name()} win - marked {coordinate.row, coordinate.column}")
+            return
+        if GameRule()._has_three_by_three(self.board, coordinate): 
+            self.player_manager.move_to_next_player()
+            player = self.player_manager.get_current_player()
+            print(f"{player.get_name()} win")
+            return
+        if GameRule()._has_four_by_four(self.board, coordinate): 
+            self.player_manager.move_to_next_player()
+            player = self.player_manager.get_current_player()
+            print(f"{player.get_name()} win")
+            return
+        if GameRule.is_draw(self.board):
+            print(f"draw game - marked {coordinate.row, coordinate.column}")
             return
 
     def display_initial_text(self):
         print("TicTacToe Game START!\n")
-        GameBoardRenderer(self.board).render()
+        ConsoleRenderer.render(self.board)
 
     def select_mode(self) -> GameMode:
         while True:

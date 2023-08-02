@@ -1,4 +1,5 @@
-from player import Player, PlayerType
+from error import NoAvailableMarkError
+from player import Player, UserPlayer, CPUPlayer, PlayerType
 from io_controller import IOController
 from game_mark import GameMark
 from game_mode import GameMode
@@ -14,17 +15,24 @@ class PlayerManager:
         self.get_current_player_index = 0
     
     def set_players(self) -> List[Player]:
-        for i in range(self.number_of_user):        
-            player = self.create_player(i, PlayerType.USER)
+        for i in range(self.number_of_user):
+            name = f"{PlayerType.USER.name}_{i + 1}"
+            mark = self.get_available_mark()    
+            player = UserPlayer(name, mark)
             self.players.append(player)
         
         for i in range(self.number_of_cpu):
-            player = self.create_player(i, PlayerType.CPU)
+            name = f"{PlayerType.CPU.name}_{i + 1}"
+            mark = self.get_available_mark()    
+            player = CPUPlayer(name, mark)
             self.players.append(player)
 
         if self.game_mode == GameMode.PVC:
             if self.make_cpu_first_player():
                 self.players.reverse()
+        
+        for player in self.players:
+            player.order = self.players.index(player) + 1
 
     def get_current_player(self) -> Player:
         return self.players[self.get_current_player_index % self.number_of_players]
@@ -32,17 +40,11 @@ class PlayerManager:
     def move_to_next_player(self):
         self.get_current_player_index += 1
 
-    def create_player(self, index, player_type: PlayerType) -> Player:
-        name = f"{player_type.name}_{index + 1}"
-        mark = self.get_available_mark()
-        return Player(name, mark, player_type)
-
     def get_available_mark(self) -> str:
         try:
             return self.game_marks.pop(0)
         except IndexError:
-            print("No available game marks.")
-            exit(1)
+            raise NoAvailableMarkError()
 
     @staticmethod
     def make_cpu_first_player() -> bool:

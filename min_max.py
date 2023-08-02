@@ -1,5 +1,10 @@
 from collections import deque
+from typing import List, Tuple, Set
+from board import Line, GameBoard, Coordinate, CrossRightToLeftLine
+from game_rule import GameRule
+from player import Player
 import math
+import copy
 
 class MinMax():
     def breath_first_search(self, root):
@@ -18,7 +23,7 @@ class MinMax():
         self.return_child_node_max_value(node)
         self.breath_first_search(node)
 
-    # 自分ターンの場合、子ノードの最大値、哀帝ターンの場合、子ノードの最小値を返す
+    # 自分ターンの場合、子ノードの最大値、相手ターンの場合、子ノードの最小値を返す
     def return_child_node_max_value(self, node, turn = 2):
         if not node.children:
             # node.value ではなく静的評価関数をかえす
@@ -38,31 +43,42 @@ class MinMax():
             node.value = tmp
             return tmp
 
-
-
-
-
-class TreeNode():
-    def __init__(self, value):
-        self.value = value
-        self.children = []
+    def scoring_line(self, line: Line) -> List[int]:
+        if line.is_line_empty():
+            return [0] * len(line)
         
-    def add_child(self, child_node_value):
-        # creates parent-child relationship
-        node = TreeNode(child_node_value)
-        self.children.append(node)
+    # check all empty cell and simulate if move is prohibited
+    # return simulated prohibit moves
+    def get_simulate_prohibited(self, board: GameBoard, player: Player) -> Set[Tuple[int, int]]:
+        prohibited_set = set()
+        for i in board.row_range():
+            for j in board.column_range():
+                
+                if not board.is_empty(i, j):
+                    continue
+                
+                _board = copy.deepcopy(board)
+                _coordinate = Coordinate(i, j)
+                _mark = player.get_mark()
+                _board.set_mark(_coordinate, _mark)
+                
+                if GameRule().is_prohibited_move(_board, _coordinate, player):
+                    prohibited_set.add((i, j))
+        return prohibited_set
 
-root = TreeNode(0)
-root.add_child(1)
-root.add_child(2)
-root.add_child(3)
-root.children[0].add_child(4)
-root.children[0].children[0].add_child(8)
-root.children[0].children[0].add_child(10)
-root.children[0].children[0].children[0].add_child(11)
-root.children[0].add_child(9)
-root.children[2].add_child(5)
-root.children[2].children[0].add_child(6)
-root.children[2].children[0].add_child(7)
+    # check if 
+    def find_check_position(self, line: Line, player: Player) -> List[int]:
+        if line.is_line_empty():
+            return None
+        
+        result = []
+        _mark = player.get_mark()
+        # +1 due to return coordinate of the board (1 ~ 9)
+        for i in range(1, len(line.line) + 1):
+            if line.is_marked_position(i):
+                continue
+            line.index = i
+            if line.get_length_without_jump(_mark) >= 5:
+                result.append(i)
+        return result
 
-MinMax().test(root)
