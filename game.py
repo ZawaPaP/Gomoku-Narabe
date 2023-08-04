@@ -28,14 +28,14 @@ class Game:
                 ConsoleRenderer.render(self.board)
                 if GameRule().is_over(self.board, coordinate, player):
                     break
-                self.player_manager.move_to_next_player()
+                self.player_manager.next_player()
                 
             except ValueError or IndexError as e:
                 print(str(e))
                 continue
 
         if GameRule()._is_over_line(self.board, coordinate, player): 
-            self.player_manager.move_to_next_player()
+            self.player_manager.next_player()
             player = self.player_manager.get_current_player()
             print(f"{player.get_name()} win")
             return
@@ -43,12 +43,12 @@ class Game:
             print(f"{player.get_name()} win - marked {coordinate.row, coordinate.column}")
             return
         if GameRule()._has_three_by_three(self.board, coordinate): 
-            self.player_manager.move_to_next_player()
+            self.player_manager.next_player()
             player = self.player_manager.get_current_player()
             print(f"{player.get_name()} win")
             return
         if GameRule()._has_four_by_four(self.board, coordinate): 
-            self.player_manager.move_to_next_player()
+            self.player_manager.next_player()
             player = self.player_manager.get_current_player()
             print(f"{player.get_name()} win")
             return

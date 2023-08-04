@@ -1,17 +1,12 @@
 # Gomoku-Narabe
 
-## 1. Introduction
-Change the TicTacToe game to Gomoku-Narabe, implement the Min-Max logic as CPU playing
-## Agenda
+## Introduction
+Create Gomoku-Narabe, implement the Min-Max logic as CPU playing
 
+## Product
+Gomoku-Narabe
 
-
-## What I did?
-### 12 Jul. 2023
-* Learn inheritance
-* Start transiting TicTacToe to GomokuNarabe
-
--------
-Memo
-MenuController
-- CreateUserMenu -> number_of_players, CPU or Human, level or name を聞いてPlayerリストを返すようにする
+### prohibited moves
+Gomoku-Narabe has 3 prohibited moves if you're the first player
+3x3, 4x4, overline
+If you're not familiar with them, please search them before playing this!

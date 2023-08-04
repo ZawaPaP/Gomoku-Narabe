@@ -78,8 +78,10 @@ class GameRule:
         return False
 
     def has_winner(self, board: GameBoard, coordinate: Coordinate) -> bool:
+
         length = board.get_longest_length(coordinate)
         if length >= self._win_length():
+            print(length)
             return True
         return False
 

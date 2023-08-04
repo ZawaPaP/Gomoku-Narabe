@@ -12,8 +12,11 @@ class NoOutCastMarkError(GameSettingError):
         return f"NoOutCastMarkError: there is no outcast mark in the window"
 
 
-class InvalidInputError(Exception):
+class PlayerManagerError(Exception):
+    def __str__(self) -> str:
+        return "PlayerManagerError"
 
+class InvalidInputError(Exception):
     def __str__(self):
         return f"InvalidInputError:"
 

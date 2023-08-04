@@ -53,6 +53,13 @@ class GameBoard:
     def is_empty(self, row, column) -> bool:
         return self.get_mark(row, column) == GameMark.EMPTY.value
 
+    def is_full(self) -> bool:
+        for i in self.row_range():
+            for j in self.column_range():
+                if self.is_empty(i, j):
+                    return False
+        return True
+
     def get_longest_length(self, coordinate: Coordinate) -> int:
         _mark = self.get_mark(coordinate.row, coordinate.column)
         # get mark-length 
@@ -127,6 +134,20 @@ class Line:
             if self._is_both_side_empty(left, right):
                 return True
         return False            
+
+    # check if the move made chain3 (1 empty acceptable)
+    def has_chain2(self) -> bool:
+        # if chain is longer than 2, False
+        if self.has_chain3():
+            return False
+        # get windows which has 2 marks in window (size 3)
+        # _windows is list of tuple (window left index, window right index)
+        _windows = self._get_windows(finding_length=2)
+        for window in _windows:
+            left, right = window
+            if self._is_both_side_empty(left, right):
+                return True
+        return False   
 
     def get_length_without_jump(self, mark) -> int:
         length = 0
@@ -250,7 +271,6 @@ class ColumnLine(Line):
     def index(self) -> int:
         return self._index
 
-
 # list of marks from the coordinate - up left to down right direction
 class CrossLeftToRightLine(Line):
     def __init__(self, board: GameBoard, coordinate: Coordinate) -> None:
@@ -258,7 +278,6 @@ class CrossLeftToRightLine(Line):
         self._index = min(coordinate.row, coordinate.column)
         self._line = self._create_line()
         
-    
     @property
     def line(self) -> List[GameMark]:
         return self._line

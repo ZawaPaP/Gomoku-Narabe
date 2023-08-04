@@ -1,4 +1,4 @@
-from error import NoAvailableMarkError
+from error import NoAvailableMarkError, PlayerManagerError
 from player import Player, UserPlayer, CPUPlayer, PlayerType
 from io_controller import IOController
 from game_mark import GameMark
@@ -37,8 +37,15 @@ class PlayerManager:
     def get_current_player(self) -> Player:
         return self.players[self.get_current_player_index % self.number_of_players]
 
-    def move_to_next_player(self):
+    def next_player(self):
         self.get_current_player_index += 1
+
+    def get_opponent(self, player: Player) -> Player:
+        if self.players != 2:
+            raise PlayerManagerError()
+        for _player in self.players:
+            if player != _player:
+                return _player
 
     def get_available_mark(self) -> str:
         try:
