@@ -1,6 +1,8 @@
 import pytest
 from board import GameBoard, Coordinate, RowLine, ColumnLine, CrossLeftToRightLine, CrossRightToLeftLine, Line
 from player import Player, CPUPlayer
+from player_manager import PlayerManager
+from game_mode import GameMode
 from min_max import MinMax
 
 
@@ -15,21 +17,67 @@ class Board(GameBoard):
             self.set_mark(self.c(row, index + 1), mark)
 
 # example board for test
-def _create_test_board():
+def _create_test_board_01():
     board = Board()
-    board._set_line(1, [" ", "o", "o", " ", " ", " ", " ", "o", " "])
-    board._set_line(2, [" ", "o", " ", "o", " ", "o", " ", "o", " "])
-    board._set_line(3, [" ", "o", "o", " ", " ", " ", " ", " ", " "])
-    board._set_line(4, [" ", " ", "o", "o", "o", "o", " ", "o", " "])
-    board._set_line(5, ["o", "o", "o", "o", "o", "o", "o", "o", "x"])
-    board._set_line(6, ["o", "o", "o", "o", " ", "o", "o", " ", "o"])
-    board._set_line(7, [" ", " ", " ", " ", " ", " ", " ", " ", "o"])
-    board._set_line(8, ["o", " ", " ", " ", "o", "o", " ", " ", " "])
-    board._set_line(9, [" ", "o", "o", "o", " ", " ", " ", "o", " "])
+    board._set_line(1, ["o", "x", "o", " ", " ", "x", " ", "o", " "])
+    board._set_line(2, [" ", "x", " ", "o", " ", "o", "x", "o", " "])
+    board._set_line(3, [" ", "x", "o", " ", " ", " ", " ", "o", " "])
+    board._set_line(4, [" ", "o", "o", " ", "o", " ", " ", "x", " "])
+    board._set_line(5, [" ", "o", "x", "o", " ", " ", "o", "o", "x"])
+    board._set_line(6, [" ", "x", "o", "x", " ", "o", " ", " ", " "])
+    board._set_line(7, [" ", " ", " ", " ", "x", "o", " ", " ", " "])
+    board._set_line(8, [" ", " ", " ", " ", " ", "o", " ", " ", " "])
+    board._set_line(9, [" ", "x", "x", "x", " ", " ", " ", " ", " "])
     return board
 
-class TestCPU:
+# example board for test
+def _create_test_board_02():
+    board = Board()
+    board._set_line(1, [" ", " ", " ", " ", " ", " ", " ", " ", " "])
+    board._set_line(2, [" ", " ", " ", " ", " ", " ", " ", " ", " "])
+    board._set_line(3, [" ", " ", " ", " ", " ", " ", " ", " ", " "])
+    board._set_line(4, [" ", " ", " ", "o", "x", " ", " ", " ", " "])
+    board._set_line(5, [" ", " ", " ", "o", " ", "x", " ", " ", " "])
+    board._set_line(6, [" ", " ", " ", " ", " ", " ", " ", " ", " "])
+    board._set_line(7, [" ", " ", " ", " ", " ", " ", " ", " ", " "])
+    board._set_line(8, [" ", " ", " ", " ", " ", " ", " ", " ", " "])
+    board._set_line(9, [" ", " ", " ", " ", " ", " ", " ", " ", " "])
+    return board
 
+class TestMinMax:
+    
+    class TestFindBestMove:
+        @pytest.fixture
+        def board(self):
+            return _create_test_board_02()
+
+        def test_find_best_move(self, board):
+            player = CPUPlayer("test_cpu1", "x")
+            player.order = 1
+            opponent_player = CPUPlayer("test_cpu2", "o")
+            opponent_player.order = 2
+            assert MinMax().find_best_move(board, player, opponent_player) == (3, 4)
+
+    class TestEvaluateMove:
+        @pytest.fixture
+        def board(self):
+            return _create_test_board_01()
+
+        @pytest.fixture
+        def player(self):
+            return CPUPlayer("test_cpu", "o")
+        
+        @pytest.mark.parametrize('coordinate, expected_result', [
+            (Coordinate(1, 1), 4), 
+            (Coordinate(4, 2), 104),
+            (Coordinate(7, 6), 64),
+            (Coordinate(3, 8), 4),
+        ])
+
+        def test_evaluate_move(self, board, coordinate, player, expected_result):
+            assert MinMax().evaluate_move(board, coordinate, player) == expected_result  
+
+    """
     class TestGetSimulatedProhibited:
         @pytest.fixture
         def board(self):
@@ -68,8 +116,6 @@ class TestCPU:
             result = MinMax().get_simulate_prohibited(board, player)
             assert sorted(result) == sorted(expected_result)
 
-
-
     class TestFindCheckPosition:
         @pytest.fixture
         def board(self):
@@ -90,3 +136,4 @@ class TestCPU:
             _line = RowLine(board, coordinate)
             _line.line = marks
             assert MinMax().find_check_position(_line) == expected_result   
+    """
