@@ -4,6 +4,7 @@ from io_controller import IOController
 from game_mark import GameMark
 from game_mode import GameMode
 from typing import List
+from cpu_logic import DumbCPULogic, HighCPULogic
 
 class PlayerManager:
     def __init__(self, game_mode: GameMode) -> None:
@@ -12,9 +13,28 @@ class PlayerManager:
         self.game_marks = GameMark.get_game_marks()
         self.number_of_user, self.number_of_cpu = GameMode.get_player_counts(game_mode)
         self.number_of_players = self.number_of_cpu + self.number_of_user
-        self.get_current_player_index = 0
+        self.current_player_index = 0
     
-    def set_players(self) -> List[Player]:
+    # for testing only 
+    def set_players(self):
+        name = f"{PlayerType.CPU.name}_Random"
+        mark = self.get_available_mark()
+        logic = DumbCPULogic
+        player = CPUPlayer(name, mark, logic)
+        self.players.append(player)
+
+        name = f"{PlayerType.CPU.name}_High"
+        mark = self.get_available_mark()
+        logic = HighCPULogic
+        player = CPUPlayer(name, mark, logic)
+        self.players.append(player)
+        
+        for i, player in enumerate(self.players):
+            player.order = i + 1
+            player.opponent = self.players[(i + 1) % self.number_of_players]
+    
+    """
+    def set_players(self):
         for i in range(self.number_of_user):
             name = f"{PlayerType.USER.name}_{i + 1}"
             mark = self.get_available_mark()    
@@ -31,14 +51,16 @@ class PlayerManager:
             if self.make_cpu_first_player():
                 self.players.reverse()
         
-        for player in self.players:
-            player.order = self.players.index(player) + 1
+        for i, player in enumerate(self.players):
+            player.order = i + 1
+            player.opponent = self.players[(i + 1) % self.number_of_players]
+    """
 
     def get_current_player(self) -> Player:
-        return self.players[self.get_current_player_index % self.number_of_players]
+        return self.players[self.current_player_index % self.number_of_players]
 
     def next_player(self):
-        self.get_current_player_index += 1
+        self.current_player_index += 1
 
     def get_opponent(self, player: Player) -> Player:
         if self.players != 2:

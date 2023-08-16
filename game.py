@@ -4,6 +4,7 @@ from board_renderer import ConsoleRenderer
 from player_manager import PlayerManager
 from game_rule import GameRule
 from game_mode import GameMode
+from game_analyzer import GameAnalyzer
 from io_controller import IOController
 
 class Game:
@@ -11,6 +12,7 @@ class Game:
         self.game_mode = self.select_mode()
         self.player_manager = PlayerManager(self.game_mode)
         self.board = GameBoard()
+        self.rule = GameRule()
 
     def play(self):
         self.player_manager.set_players()
@@ -21,38 +23,33 @@ class Game:
                 #print(f"{player.name}'s turn\n")
                 #player.make_move(self.board) 
                 coordinate = player.get_mark_coordinate(self.board)
-                if self.board.is_empty(coordinate.row, coordinate.column):
+                if self.board.is_coordinate_empty(coordinate):
                     self.board.set_mark(coordinate, player.mark)
                 else:
                     raise NotEmptyCoordinateError()
                 ConsoleRenderer.render(self.board)
-                if GameRule().is_over(self.board, coordinate, player):
+                if self.rule.is_over(self.board, coordinate, player.mark, player.is_first_player()):
                     break
+                
                 self.player_manager.next_player()
                 
             except ValueError or IndexError as e:
                 print(str(e))
                 continue
-
-        if GameRule()._is_over_line(self.board, coordinate, player): 
-            self.player_manager.next_player()
-            player = self.player_manager.get_current_player()
-            print(f"{player.get_name()} win")
+        if self.rule.prohibited_long_chain(self.board, coordinate, player.mark, player.is_first_player()): 
+            print(f"prohibited move: over line length {coordinate.row, coordinate.column}")
             return
-        if GameRule().has_winner(self.board, coordinate): 
+        if self.rule.is_win_move(self.board, coordinate, player.mark): 
             print(f"{player.get_name()} win - marked {coordinate.row, coordinate.column}")
             return
-        if GameRule()._has_three_by_three(self.board, coordinate): 
-            self.player_manager.next_player()
-            player = self.player_manager.get_current_player()
-            print(f"{player.get_name()} win")
+        
+        if self.rule.prohibited_chain_by_chain(self.board, coordinate, player.mark, player.is_first_player(), GameAnalyzer.has_three_by_three): 
+            print(f"prohibited move: three by three {coordinate.row, coordinate.column}")
             return
-        if GameRule()._has_four_by_four(self.board, coordinate): 
-            self.player_manager.next_player()
-            player = self.player_manager.get_current_player()
-            print(f"{player.get_name()} win")
+        if self.rule.prohibited_chain_by_chain(self.board, coordinate, player.mark, player.is_first_player(), GameAnalyzer.has_four_by_four): 
+            print(f"prohibited move: four by four {coordinate.row, coordinate.column}")
             return
-        if GameRule.is_draw(self.board):
+        if self.rule.is_draw(self.board):
             print(f"draw game - marked {coordinate.row, coordinate.column}")
             return
 
