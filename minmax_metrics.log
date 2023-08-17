@@ -1,0 +1,187 @@
+ERROR:root:Start the game
+INFO:root:board marked (2, 5) - x
+INFO:root:find best move 7.9079296588897705
+INFO:root:Function generate_move: Execution time = 8.014301061630249 seconds, Memory usage = 0.0625 MB
+INFO:root:board marked (4, 5) - o
+INFO:root:board marked (5, 2) - x
+INFO:root:find best move 62.50805592536926
+INFO:root:Function generate_move: Execution time = 62.6150107383728 seconds, Memory usage = -11.125 MB
+INFO:root:board marked (5, 6) - o
+INFO:root:board marked (9, 8) - x
+INFO:root:find best move 111.73786997795105
+INFO:root:Function generate_move: Execution time = 111.84529185295105 seconds, Memory usage = -0.4375 MB
+INFO:root:board marked (3, 4) - o
+INFO:root:board marked (6, 5) - x
+INFO:root:find best move 18.76839303970337
+INFO:root:Function generate_move: Execution time = 18.873767852783203 seconds, Memory usage = 0.140625 MB
+INFO:root:board marked (6, 7) - o
+INFO:root:board marked (3, 9) - x
+INFO:root:find best move 0.5404882431030273
+INFO:root:Function generate_move: Execution time = 0.6457149982452393 seconds, Memory usage = 0.03125 MB
+INFO:root:board marked (2, 3) - o
+INFO:root:CPU_High win - marked (2, 3)
+ERROR:root:
+ Start the game
+INFO:root:board marked (2, 8) - x
+INFO:root:Function generate_move: Execution time = 4.461073875427246 seconds, Memory usage = 0.046875 MB
+INFO:root:board marked (4, 6) - o
+INFO:root:board marked (7, 7) - x
+INFO:root:Function generate_move: Execution time = 54.86042618751526 seconds, Memory usage = -8.40625 MB
+INFO:root:board marked (4, 5) - o
+INFO:root:board marked (1, 4) - x
+INFO:root:Function generate_move: Execution time = 120.5118339061737 seconds, Memory usage = -3.859375 MB
+INFO:root:board marked (4, 4) - o
+INFO:root:board marked (6, 6) - x
+INFO:root:Function generate_move: Execution time = 24.029664993286133 seconds, Memory usage = 0.140625 MB
+INFO:root:board marked (4, 3) - o
+INFO:root:board marked (4, 8) - x
+INFO:root:Function generate_move: Execution time = 0.6040291786193848 seconds, Memory usage = 0.015625 MB
+INFO:root:board marked (4, 2) - o
+INFO:root:CPU_High win - marked (4, 2)
+ERROR:root:
+ Start the game
+INFO:root:board marked (2, 9) - x
+INFO:root:Function generate_move: Execution time = 2.69496488571167 seconds, Memory usage = -6.96875 MB
+INFO:root:board marked (4, 7) - o
+INFO:root:board marked (8, 5) - x
+INFO:root:Function generate_move: Execution time = 38.997769832611084 seconds, Memory usage = 1.734375 MB
+INFO:root:board marked (5, 7) - o
+INFO:root:board marked (5, 6) - x
+INFO:root:Function generate_move: Execution time = 66.42163014411926 seconds, Memory usage = -6.515625 MB
+INFO:root:board marked (3, 7) - o
+INFO:root:board marked (7, 5) - x
+INFO:root:Function generate_move: Execution time = 18.387875080108643 seconds, Memory usage = -1.171875 MB
+INFO:root:board marked (6, 7) - o
+INFO:root:board marked (7, 9) - x
+INFO:root:Function generate_move: Execution time = 0.4987800121307373 seconds, Memory usage = 0.140625 MB
+INFO:root:board marked (7, 7) - o
+INFO:root:CPU_High win - marked (7, 7)
+ERROR:root:
+ Start the game
+INFO:root:board marked (2, 6) - x
+INFO:root:Function generate_move: Execution time = 8.662566184997559 seconds, Memory usage = -4.171875 MB
+INFO:root:board marked (2, 5) - o
+INFO:root:board marked (4, 2) - x
+INFO:root:Function generate_move: Execution time = 39.10191798210144 seconds, Memory usage = 0.0 MB
+INFO:root:board marked (4, 5) - o
+INFO:root:board marked (8, 1) - x
+INFO:root:Function generate_move: Execution time = 91.5814311504364 seconds, Memory usage = -8.5 MB
+INFO:root:board marked (3, 5) - o
+INFO:root:board marked (8, 2) - x
+INFO:root:Function generate_move: Execution time = 18.01904606819153 seconds, Memory usage = 0.171875 MB
+INFO:root:board marked (5, 5) - o
+INFO:root:board marked (5, 3) - x
+INFO:root:Function generate_move: Execution time = 0.5029168128967285 seconds, Memory usage = 0.015625 MB
+INFO:root:board marked (6, 5) - o
+INFO:root:CPU_High win - marked (6, 5)
+ERROR:root:
+ Start the game
+INFO:root:board marked (5, 7) - x
+INFO:root:Function generate_move: Execution time = 14.698339700698853 seconds, Memory usage = -5.0625 MB
+INFO:root:board marked (5, 5) - o
+INFO:root:board marked (8, 3) - x
+INFO:root:Function generate_move: Execution time = 58.09219479560852 seconds, Memory usage = -6.640625 MB
+INFO:root:board marked (6, 5) - o
+INFO:root:board marked (4, 3) - x
+INFO:root:Function generate_move: Execution time = 101.42247009277344 seconds, Memory usage = -1.484375 MB
+INFO:root:board marked (4, 5) - o
+INFO:root:board marked (1, 5) - x
+INFO:root:Function generate_move: Execution time = 24.03155779838562 seconds, Memory usage = -1.140625 MB
+INFO:root:board marked (3, 5) - o
+INFO:root:board marked (6, 7) - x
+INFO:root:Function generate_move: Execution time = 0.6168460845947266 seconds, Memory usage = 0.125 MB
+INFO:root:board marked (2, 5) - o
+INFO:root:CPU_High win - marked (2, 5)
+ERROR:root:
+ Start the game
+INFO:root:board marked (6, 6) - x
+INFO:root:Function generate_move: Execution time = 14.230457067489624 seconds, Memory usage = -5.140625 MB
+INFO:root:board marked (5, 5) - o
+INFO:root:board marked (9, 4) - x
+INFO:root:Function generate_move: Execution time = 46.50097632408142 seconds, Memory usage = -6.5625 MB
+INFO:root:board marked (5, 4) - o
+INFO:root:board marked (2, 5) - x
+INFO:root:Function generate_move: Execution time = 105.90822720527649 seconds, Memory usage = -1.4375 MB
+INFO:root:board marked (5, 6) - o
+INFO:root:board marked (2, 1) - x
+INFO:root:Function generate_move: Execution time = 26.395407915115356 seconds, Memory usage = 0.1875 MB
+INFO:root:board marked (5, 3) - o
+INFO:root:board marked (3, 4) - x
+INFO:root:Function generate_move: Execution time = 0.6326248645782471 seconds, Memory usage = 0.046875 MB
+INFO:root:board marked (5, 7) - o
+INFO:root:CPU_High win - marked (5, 7)
+ERROR:root:
+ Start the game
+INFO:root:board marked (6, 8) - x
+INFO:root:Function generate_move: Execution time = 8.425915002822876 seconds, Memory usage = 0.140625 MB
+INFO:root:board marked (5, 8) - o
+INFO:root:board marked (8, 5) - x
+INFO:root:Function generate_move: Execution time = 44.05037307739258 seconds, Memory usage = -11.625 MB
+INFO:root:board marked (5, 6) - o
+INFO:root:board marked (5, 5) - x
+INFO:root:Function generate_move: Execution time = 120.06493401527405 seconds, Memory usage = -1.375 MB
+INFO:root:board marked (4, 7) - o
+INFO:root:board marked (7, 4) - x
+INFO:root:Function generate_move: Execution time = 149.85832023620605 seconds, Memory usage = -2.234375 MB
+INFO:root:board marked (3, 6) - o
+INFO:root:board marked (2, 4) - x
+INFO:root:Function generate_move: Execution time = 29.250648021697998 seconds, Memory usage = 0.140625 MB
+INFO:root:board marked (2, 5) - o
+INFO:root:board marked (7, 2) - x
+INFO:root:Function generate_move: Execution time = 0.6486330032348633 seconds, Memory usage = 0.0 MB
+INFO:root:board marked (1, 4) - o
+INFO:root:CPU_High win - marked (1, 4)
+ERROR:root:
+ Start the game
+INFO:root:board marked (7, 7) - x
+INFO:root:Function generate_move: Execution time = 11.794431924819946 seconds, Memory usage = 0.015625 MB
+INFO:root:board marked (5, 5) - o
+INFO:root:board marked (1, 9) - x
+INFO:root:Function generate_move: Execution time = 42.825703859329224 seconds, Memory usage = 0.0625 MB
+INFO:root:board marked (5, 4) - o
+INFO:root:board marked (5, 8) - x
+INFO:root:Function generate_move: Execution time = 92.57459092140198 seconds, Memory usage = -5.4375 MB
+INFO:root:board marked (5, 6) - o
+INFO:root:board marked (8, 4) - x
+INFO:root:Function generate_move: Execution time = 46.47819209098816 seconds, Memory usage = -5.46875 MB
+INFO:root:board marked (5, 7) - o
+INFO:root:board marked (4, 3) - x
+INFO:root:Function generate_move: Execution time = 0.665985107421875 seconds, Memory usage = 0.046875 MB
+INFO:root:board marked (5, 3) - o
+INFO:root:CPU_High win - marked (5, 3)
+ERROR:root:
+ Start the game
+INFO:root:board marked (2, 5) - x
+INFO:root:Function generate_move: Execution time = 7.954639911651611 seconds, Memory usage = 0.015625 MB
+INFO:root:board marked (4, 5) - o
+INFO:root:board marked (5, 2) - x
+INFO:root:Function generate_move: Execution time = 63.49047303199768 seconds, Memory usage = -6.59375 MB
+INFO:root:board marked (5, 6) - o
+INFO:root:board marked (7, 2) - x
+INFO:root:Function generate_move: Execution time = 150.1212432384491 seconds, Memory usage = -5.296875 MB
+INFO:root:board marked (3, 4) - o
+INFO:root:board marked (5, 9) - x
+INFO:root:Function generate_move: Execution time = 23.80729603767395 seconds, Memory usage = 0.125 MB
+INFO:root:board marked (6, 7) - o
+INFO:root:board marked (6, 9) - x
+INFO:root:Function generate_move: Execution time = 0.5822620391845703 seconds, Memory usage = 0.0 MB
+INFO:root:board marked (2, 3) - o
+INFO:root:CPU_High win - marked (2, 3)
+ERROR:root:
+ Start the game
+INFO:root:board marked (7, 6) - x
+INFO:root:Function generate_move: Execution time = 12.6996431350708 seconds, Memory usage = 0.140625 MB
+INFO:root:board marked (6, 5) - o
+INFO:root:board marked (1, 7) - x
+INFO:root:Function generate_move: Execution time = 58.81629204750061 seconds, Memory usage = -7.609375 MB
+INFO:root:board marked (5, 5) - o
+INFO:root:board marked (7, 9) - x
+INFO:root:Function generate_move: Execution time = 95.93788003921509 seconds, Memory usage = 0.078125 MB
+INFO:root:board marked (4, 5) - o
+INFO:root:board marked (1, 1) - x
+INFO:root:Function generate_move: Execution time = 26.76833486557007 seconds, Memory usage = 0.03125 MB
+INFO:root:board marked (3, 5) - o
+INFO:root:board marked (2, 7) - x
+INFO:root:Function generate_move: Execution time = 0.6752870082855225 seconds, Memory usage = 0.0 MB
+INFO:root:board marked (2, 5) - o
+INFO:root:CPU_High win - marked (2, 5)

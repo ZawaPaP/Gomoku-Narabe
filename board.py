@@ -1,7 +1,7 @@
 from game_mark import GameMark
 from error import OutRangeCoordinateError, NoOutCastMarkError, NoLineExistError
-from typing import Tuple, List, Dict
-
+from typing import Tuple, List, Set
+from collections import Counter
 class BoardCell:
     def __init__(self) -> None:
         self.mark = GameMark.EMPTY.value
@@ -10,15 +10,14 @@ class Coordinate:
     def __init__(self, row: int, column: int) -> None:
         self.row = row
         self.column = column
-
-
-    def is_in_board(self) -> bool:
-        if self.row in GameBoard.row_range() and self.column in GameBoard.column_range():
-            return True
         
-        else:
-            raise OutRangeCoordinateError(f"{self.row, self.column}")
+    def __eq__(self, other):
+        if isinstance(other, Coordinate):
+            return self.row == other.row and self.column == other.column
+        return False
 
+    def __hash__(self):
+        return hash((self.row, self.column))
 
 class GameBoard:
     ROW = 9
@@ -26,6 +25,7 @@ class GameBoard:
 
     def __init__(self) -> None:
         self.board = [[BoardCell() for _ in range(self.column())] for _ in range(self.row())]
+        # marked coordinates (1 ~ 9)
 
     @staticmethod
     def row() -> int:
@@ -43,201 +43,105 @@ class GameBoard:
 
     def get_mark(self, row, column) -> GameMark:
         return self.board[row - 1][column - 1].mark
-
+        
+    # set mark on the coordinate
     def set_mark(self, coordinate: Coordinate, mark: GameMark) -> None:
         self.board[coordinate.row - 1][coordinate.column - 1].mark = mark
 
-    def remove_mark(self, coordinate: Coordinate) -> None:
+    # remove mark from the coordinate
+    def remove_mark(self, coordinate: Coordinate):
         self.board[coordinate.row - 1][coordinate.column - 1].mark = GameMark.EMPTY.value
 
-    def is_empty(self, row, column) -> bool:
-        return self.get_mark(row, column) == GameMark.EMPTY.value
+    def is_in_board(self, coordinate: Coordinate) -> bool:
+        if coordinate.row in self.row_range() and coordinate.column in self.column_range():
+            return True
+        else:
+            raise OutRangeCoordinateError()
 
-    def is_full(self) -> bool:
+    def is_empty(self) -> bool:
         for i in self.row_range():
             for j in self.column_range():
-                if self.is_empty(i, j):
+                if self.get_mark(i, j) != GameMark.EMPTY.value:
                     return False
         return True
 
-    def get_longest_length(self, coordinate: Coordinate) -> int:
-        _mark = self.get_mark(coordinate.row, coordinate.column)
-        # get mark-length 
-        _longest_length = max(
-            RowLine(self, coordinate).get_length_without_jump(_mark), 
-            ColumnLine(self, coordinate).get_length_without_jump(_mark),
-            CrossLeftToRightLine(self, coordinate).get_length_without_jump(_mark),
-            CrossRightToLeftLine(self, coordinate).get_length_without_jump(_mark)
-        )
-        return _longest_length
+    # check if the coordinate is empty or not
+    def is_cell_empty(self, row, column) -> bool:
+        return self.get_mark(row, column) == GameMark.EMPTY.value
+
+
+    # check if the coordinate is empty or not
+    def is_coordinate_empty(self, coordinate: Coordinate) -> bool:
+        return self.get_mark(coordinate.row, coordinate.column) == GameMark.EMPTY.value
+    
+    # check if board is full or not and return bool
+    def is_full(self) -> bool:
+        for i in self.row_range():
+            for j in self.column_range():
+                if self.is_cell_empty(i, j):
+                    return False
+        return True
+
+    # get horizontal, vertical, diagonals lines of the coordinate
+    def get_lines_from_coordinate(self, coordinate: Coordinate) -> List['Line']:
+        lines = [
+            RowLine(self, coordinate),
+            ColumnLine(self, coordinate),
+            PrincipalDiagonalLine(self, coordinate),
+            SecondaryDiagonalLine(self, coordinate)
+        ]
+        return lines
 
 class Line:
     def __init__(self, board: GameBoard, coordinate: Coordinate) -> None:
         self.board = board
         self.coordinate = coordinate
-        self._line = None
-        self._index = None
+        self.start = self._start_index()
+        self.end = self._end_index()
+        self._line = self._generate_line()
+        self._index = self._coordinate_index()
+
+    def __eq__(self, other):
+        if isinstance(other, Line):
+            return (self.start, self.end) == (other.start, other.end)
+        return False
+
+    def __hash__(self):
+        return hash((self.start, self.end))
 
     @property
     def line(self) -> List[GameMark]:
         raise NotImplementedError()
-
-    @property
-    # return index in the line 
-    def index(self) -> int:
+    
+    def _start_index(self):
         raise NotImplementedError()
 
-    def get_mark(self, index: int) -> GameMark:
-        return self.line[index - 1]
+    def _end_index(self):
+        raise NotImplementedError()
     
-    def is_marked_position(self, index:int) -> bool:
-        if self.line[index - 1] == GameMark.EMPTY.value:
-            return False
-        return True
-        
-    def is_in_range(self, index: int) -> bool:
-        if index in range(1, len(self.line) + 1):
-            return True
-        return False
+    def _coordinate_index(self):
+        raise NotImplementedError()
+    
+    def _generate_line(self):
+        raise NotImplementedError()
 
-    def is_line_empty(self) -> bool:
+    def get_board_coordinate(self, list_index: int) -> Coordinate(int, int):
+        raise NotImplementedError()
+
+    def is_empty(self) -> bool:
         if self.line == None:
             raise NoLineExistError()
         return all(mark == GameMark.EMPTY.value for mark in self.line)
-
-
-    # check if the move made chain4 (1 empty acceptable)
-    def has_chain4(self) -> bool:
-        # if chain is longer than 4, it is not chain4
-        _mark = self.get_mark(self.index)
-        if self.get_length_without_jump(_mark) > 4:
-            return False
-        # window_size = finding mark-length + 1
-        # because some cases accept 1 jump
-        _windows = self._get_windows(finding_length=4)
-        for window in _windows:
-            left, right = window
-            if self._is_single_side_empty(left, right):
-                return True
-        return False
-
-    # check if the move made chain3 (1 empty acceptable)
-    def has_chain3(self) -> bool:
-        # if chain is longer than 3, False
-        if self.has_chain4():
-            return False
-        # get windows which has 3 marks in window (size 4)
-        # _windows is list of tuple (window left index, window right index)
-        _windows = self._get_windows(finding_length=3)
-        for window in _windows:
-            left, right = window
-            if self._is_both_side_empty(left, right):
-                return True
-        return False            
-
-    # check if the move made chain3 (1 empty acceptable)
-    def has_chain2(self) -> bool:
-        # if chain is longer than 2, False
-        if self.has_chain3():
-            return False
-        # get windows which has 2 marks in window (size 3)
-        # _windows is list of tuple (window left index, window right index)
-        _windows = self._get_windows(finding_length=2)
-        for window in _windows:
-            left, right = window
-            if self._is_both_side_empty(left, right):
-                return True
-        return False   
-
-    def get_length_without_jump(self, mark) -> int:
-        length = 0
-        # check next left from the reference point (_index)
-        for i in range(1, len(self.line)):
-            if self.is_in_range(self.index - i) and self.get_mark(self.index - i) == mark:
-                length += 1
-            else:
-                break
-        # check next right from the reference point (_index)
-        for i in range(1, len(self.line)):
-            if self.is_in_range(self.index + i) and self.get_mark(self.index + i) == mark:
-                length += 1
-            else:
-                break
-        return length + 1
-
-    # return window start and end index if the window has finding_length's marks
-
-    def _get_windows(self, finding_length: int) -> List[Tuple[int, int]]:
-        #index is range 1 to 9
-        # index is the moved position
-        _index = self.index
-        # window size = 1 + finding length because accept 1 jump
-        window_size = finding_length + 1
-        # all windows from the index
-        _windows = [(_index - i, _index - i + window_size - 1) for i in range(window_size)]
-        # get window only if in board range
-        _windows_in_range = [(start, end) for start, end in _windows if 1 <= start <= len(self.line) and 1 <= end <= len(self.line)]
-        # get window only if having window-size - 1 marks 
-        windows_with_mark = [(start, end) for start, end in _windows_in_range if self.line[start - 1: end].count(self.get_mark(_index)) == finding_length]
-        
-        return windows_with_mark
-
-    # already know window contains (length - 1) marks
-    # return True if window contains (length - 1) marks and both side empty
-    # because finding_length = window_length - 1 (accept 1 jump)
-    def _is_both_side_empty(self, left: int, right: int) -> bool:
-        window = self.line[left - 1 : right] 
-        # return False if there is no empty (there is other mark)
-        if not GameMark.EMPTY.value in window:
-            return False
-        
-        outcast_index = self._outcast_mark_index(window)
-        # if outcast is in the first cell, check if other side is empty
-        if outcast_index == 0:
-            if right < len(self.line) and self.line[right] == GameMark.EMPTY.value:
-                return True
-        # if outcast is in the last cell, check if other side is empty
-        elif outcast_index == len(window) - 1:
-            if  left - 2 >= 0 and self.line[left - 2] == GameMark.EMPTY.value:
-                return True
-        # if outcast is not side, check both side        
-        else:
-            if right < len(self.line) and left - 2 >= 0 and self.line[left - 2] == GameMark.EMPTY.value and self.line[right] == GameMark.EMPTY.value:
-                return True
-        return False
-
-    # already know window contains (length - 1) marks
-    # return True if window contains (length - 1) marks and at least one side empty
-    # because finding_length = window_length - 1 (accept 1 jump)
-    def _is_single_side_empty(self, left: int, right: int) -> bool:
-        window = self.line[left - 1: right]
-        outcast_index = self._outcast_mark_index(window)
-        
-        if window[outcast_index] == GameMark.EMPTY.value:
-            return True
-
-        if outcast_index == 0:
-            if right < len(self.line) and self.line[right] == GameMark.EMPTY.value:
-                return True
-        
-        if outcast_index == len(window) - 1:            
-            if left - 2 >= 0 and self.line[left - 2] == GameMark.EMPTY.value:
-                return True
-        return False
-        
-    def _outcast_mark_index(self, data) -> int:
-        for i in range(len(data)):
-            if data[i] != self.get_mark(self.index):
-                return i
-        raise NoOutCastMarkError()
 
 # list of marks from the coordinate - row direction
 class RowLine(Line):
     def __init__(self, board: GameBoard, coordinate: Coordinate) -> None:
         super().__init__(board, coordinate)
-        self._index = coordinate.column
-        self._line = [mark for mark in [board.get_mark(coordinate.row, column) for column in board.column_range()]]
-
+        self.start = self._start_index()
+        self.end = self._end_index()
+        self._line = self._generate_line()
+        self._index = self._coordinate_index()
+        
     @property
     def line(self) -> List[GameMark]:
         return self._line
@@ -245,49 +149,76 @@ class RowLine(Line):
     @line.setter
     def line(self, value: List[GameMark]) -> None:
         self._line = value
+        
+    def _start_index(self):
+        return (self.coordinate.row, 1)
 
-    @property
-    # return index in the line 
-    def index(self) -> int:
-        return self._index
-    
-    @index.setter
-    def index(self, value: int) -> None:
-        self._index = value
+    def _end_index(self):
+        return (self.coordinate.row, 9)
+
+    def _coordinate_index(self):
+        return self.coordinate.column - 1
+
+    def _generate_line(self):
+        return [mark for mark in [self.board.get_mark(self.coordinate.row, column) for column in self.board.column_range()]]
+
+    def get_board_coordinate(self, list_index: int) -> Coordinate(int, int):
+        return Coordinate(self.coordinate.row, 1 + list_index)
 
 # list of marks from the coordinate - column direction
 class ColumnLine(Line):
     def __init__(self, board: GameBoard, coordinate: Coordinate) -> None:
         super().__init__(board, coordinate)
-        self._index = coordinate.row
-        self._line = [mark for mark in [board.get_mark(row, coordinate.column) for row in board.row_range()]]
-    
-    @property
-    def line(self) -> List[GameMark]:
-        return self._line
-
-    @property
-    # return index in the line 
-    def index(self) -> int:
-        return self._index
-
-# list of marks from the coordinate - up left to down right direction
-class CrossLeftToRightLine(Line):
-    def __init__(self, board: GameBoard, coordinate: Coordinate) -> None:
-        super().__init__(board, coordinate)
-        self._index = min(coordinate.row, coordinate.column)
-        self._line = self._create_line()
+        self.start = self._start_index()
+        self.end = self._end_index()
+        self._line = self._generate_line()
+        self._index = self._coordinate_index()
         
     @property
     def line(self) -> List[GameMark]:
         return self._line
     
-    @property
-    def index(self) -> int:
-        return self._index
+    def _start_index(self):
+        return (1, self.coordinate.column)
 
-    def _create_line(self) -> List[GameMark]:
-        _distance_to_edge = min(self.coordinate.row - 1, self.coordinate.column - 1)
+    def _end_index(self):
+        return (9, self.coordinate.column)
+
+    def _coordinate_index(self):
+        return self.coordinate.row - 1
+
+    def _generate_line(self):
+        return [mark for mark in [self.board.get_mark(row, self.coordinate.column) for row in self.board.row_range()]]
+
+    def get_board_coordinate(self, list_index: int) -> Coordinate(int, int):
+        return Coordinate(1 + list_index, self.coordinate.column)
+
+# list of marks from the coordinate - up left to down right direction
+class PrincipalDiagonalLine(Line):
+    def __init__(self, board: GameBoard, coordinate: Coordinate):
+        super().__init__(board, coordinate)
+        self.start = self._start_index()
+        self.end = self._end_index()
+        self._line = self._generate_line()
+        self._index = self._coordinate_index()
+        
+    @property
+    def line(self) -> List[GameMark]:
+        return self._line
+
+    def _start_index(self) -> Tuple[int, int]:
+        _distance_to_start_edge = min(self.coordinate.row, self.coordinate.column) - 1
+        return (self.coordinate.row - _distance_to_start_edge, self.coordinate.column - _distance_to_start_edge)
+
+    def _end_index(self) -> Tuple[int, int]:
+        _distance_to_end_edge = min(self.board.row() - self.coordinate.row, self.board.column() - self.coordinate.column)
+        return (self.coordinate.row + _distance_to_end_edge, self.coordinate.column + _distance_to_end_edge)
+
+    def _coordinate_index(self):
+        return min(self.coordinate.row, self.coordinate.column) - 1
+
+    def _generate_line(self) -> List[GameMark]:
+        _distance_to_edge = min(self.coordinate.row, self.coordinate.column) - 1
         _line = []
         _row = self.coordinate.row - _distance_to_edge
         _column = self.coordinate.column - _distance_to_edge   
@@ -297,24 +228,37 @@ class CrossLeftToRightLine(Line):
             _column += 1
         return _line
 
+    def get_board_coordinate(self, list_index: int) -> Coordinate(int, int):
+        return Coordinate(self.start[0] + list_index, self.start[1] + list_index)
+
 
 # list of marks from the coordinate - up right to down left direction
-class CrossRightToLeftLine(Line):
+class SecondaryDiagonalLine(Line):
     def __init__(self, board: GameBoard, coordinate: Coordinate) -> None:
         super().__init__(board, coordinate)
-        self._index = min(coordinate.row, board.column() + 1 - coordinate.column)
-        self._line = self._create_line()
-
+        # start and end index are coordinates
+        self.start = self._start_index()
+        self.end = self._end_index()
+        # line is list of game mark
+        self._line = self._generate_line()
+        self._index = self._coordinate_index()
+        
     @property
     def line(self) -> List[GameMark]:
         return self._line
     
-    @property
-    # return index in the line 
-    def index(self) -> int:
-        return self._index
+    def _start_index(self) -> Tuple[int, int]:
+        _distance_to_start_edge = min(self.coordinate.row - 1, self.board.column() - self.coordinate.column)
+        return (self.coordinate.row - _distance_to_start_edge, self.coordinate.column + _distance_to_start_edge)
 
-    def _create_line(self) -> List[GameMark]:
+    def _end_index(self) -> Tuple[int, int]:
+        _distance_to_end_edge = min(self.board.row() - self.coordinate.row, self.coordinate.column - 1)
+        return (self.coordinate.row + _distance_to_end_edge, self.coordinate.column - _distance_to_end_edge)
+
+    def _coordinate_index(self):
+        return min(self.coordinate.row, self.board.column() + 1 - self.coordinate.column) - 1
+
+    def _generate_line(self) -> List[GameMark]:
         # - 1 due to the board starts from 1
         _line = []
         # - 1 due to the board starts from 1
@@ -327,3 +271,8 @@ class CrossRightToLeftLine(Line):
             _row += 1
             _column -= 1
         return _line
+
+    def get_board_coordinate(self, list_index: int) -> Coordinate(int, int):
+        return Coordinate(self.start[0] + list_index, self.start[1] - list_index)
+
+

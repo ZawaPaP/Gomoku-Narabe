@@ -7,7 +7,10 @@ Create Gomoku-Narabe, implement the Min-Max logic as CPU playing
 Gomoku-Narabe
 
 ## How to play
-WIP
+Playable on console
+1. select game mode
+2. choice the coordinate you wanna put the stone (row, column)
+
 
 ### prohibited moves
 Gomoku-Narabe has 3 prohibited moves if you're the first player

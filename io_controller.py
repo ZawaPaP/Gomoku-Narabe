@@ -1,6 +1,6 @@
 import re
 from typing import Tuple
-from error import InvalidIntInputError, InvalidCoordinateError
+from error import InvalidIntInputError, OutRangeCoordinateError
 from board import Coordinate
 
 class InputOutput:
@@ -19,14 +19,19 @@ class IOController:
                 raise InvalidIntInputError()
 
     @staticmethod
-    def get_coordinate_input(prompt: str) -> Coordinate:
+    def get_coordinate_input(board, prompt: str) -> Coordinate:
         while True:
-            user_input = InputOutput.get_input(prompt)
-            parsed_input = IOController.parse_input(user_input)
-            if IOController.validate_input(parsed_input):
-                coordinate = Coordinate(map(int, parsed_input.split(",")))
-                if coordinate.is_in_board():
-                    return coordinate
+            try:
+                user_input = InputOutput.get_input(prompt)
+                parsed_input = IOController.parse_input(user_input)
+                if IOController.validate_input(parsed_input):
+                    row, column = map(int, parsed_input.split(","))
+                    coordinate = Coordinate(row, column)
+                    if board.is_in_board(coordinate):
+                            return coordinate
+            except OutRangeCoordinateError as e:
+                print(str(e))
+                continue
 
     @staticmethod
     def validate_input(input_str: str) -> bool:

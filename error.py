@@ -38,24 +38,14 @@ class NoLineExistError(InvalidLineError):
     def __str__(self) -> str:
         return "No line existing error"
 
-
 class InvalidCoordinateError(Exception):
     def __str__(self):
         return f"InvalidCoordinateError:"
     
 class OutRangeCoordinateError(InvalidCoordinateError):
     def __str__(self):
-        return f"Coordinate is out of the board. {self.message}"
+        return f"Coordinate is out of the board."
 
 class NotEmptyCoordinateError(InvalidCoordinateError):
     def __str__(self):
         return "The position is already marked. Please choose an empty."
-
-
-
-
-
-
-
-
-

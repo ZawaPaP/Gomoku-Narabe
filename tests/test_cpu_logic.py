@@ -1,10 +1,10 @@
 import pytest
-from board import GameBoard, Coordinate, RowLine, ColumnLine, CrossLeftToRightLine, CrossRightToLeftLine, Line
+from board import GameBoard, Coordinate, RowLine, ColumnLine, PrincipalDiagonalLine, SecondaryDiagonalLine, Line
 from player import Player, CPUPlayer
 from player_manager import PlayerManager
 from game_mode import GameMode
-from min_max import MinMax
-
+from cpu_logic import MinMax
+from game_analyzer import GameAnalyzer
 
 class Board(GameBoard):
     # create coordinate class simply
@@ -17,7 +17,7 @@ class Board(GameBoard):
             self.set_mark(self.c(row, index + 1), mark)
 
 # example board for test
-def _create_test_board_01():
+def _create_test_board_large_moves():
     board = Board()
     board._set_line(1, ["o", "x", "o", " ", " ", "x", " ", "o", " "])
     board._set_line(2, [" ", "x", " ", "o", " ", "o", "x", "o", " "])
@@ -31,13 +31,27 @@ def _create_test_board_01():
     return board
 
 # example board for test
-def _create_test_board_02():
+def _create_test_board_mid_moves():
+    board = Board()
+    board._set_line(1, [" ", " ", " ", " ", " ", " ", " ", " ", " "])
+    board._set_line(2, [" ", " ", " ", " ", " ", " ", " ", " ", " "])
+    board._set_line(3, [" ", " ", " ", "x", " ", " ", " ", " ", " "])
+    board._set_line(4, [" ", " ", " ", "o", "x", " ", " ", " ", " "])
+    board._set_line(5, [" ", " ", " ", "o", " ", "x", " ", " ", " "])
+    board._set_line(6, [" ", " ", " ", "o", " ", " ", " ", " ", " "])
+    board._set_line(7, [" ", " ", " ", " ", " ", " ", " ", " ", " "])
+    board._set_line(8, [" ", " ", " ", " ", " ", " ", " ", " ", " "])
+    board._set_line(9, [" ", " ", " ", " ", " ", " ", " ", " ", " "])
+    return board
+
+# example board for test
+def _create_test_board_few_moves():
     board = Board()
     board._set_line(1, [" ", " ", " ", " ", " ", " ", " ", " ", " "])
     board._set_line(2, [" ", " ", " ", " ", " ", " ", " ", " ", " "])
     board._set_line(3, [" ", " ", " ", " ", " ", " ", " ", " ", " "])
     board._set_line(4, [" ", " ", " ", "o", "x", " ", " ", " ", " "])
-    board._set_line(5, [" ", " ", " ", "o", " ", "x", " ", " ", " "])
+    board._set_line(5, [" ", " ", " ", " ", " ", " ", " ", " ", " "])
     board._set_line(6, [" ", " ", " ", " ", " ", " ", " ", " ", " "])
     board._set_line(7, [" ", " ", " ", " ", " ", " ", " ", " ", " "])
     board._set_line(8, [" ", " ", " ", " ", " ", " ", " ", " ", " "])
@@ -45,39 +59,43 @@ def _create_test_board_02():
     return board
 
 class TestMinMax:
-    
-    class TestFindBestMove:
+
+    class TestGetRelevantCoordinates:
         @pytest.fixture
         def board(self):
-            return _create_test_board_02()
+            return _create_test_board_few_moves()
 
-        def test_find_best_move(self, board):
-            player = CPUPlayer("test_cpu1", "x")
-            player.order = 1
-            opponent_player = CPUPlayer("test_cpu2", "o")
-            opponent_player.order = 2
-            assert MinMax().find_best_move(board, player, opponent_player) == (3, 4)
-
-    class TestEvaluateMove:
-        @pytest.fixture
-        def board(self):
-            return _create_test_board_01()
-
-        @pytest.fixture
-        def player(self):
-            return CPUPlayer("test_cpu", "o")
-        
-        @pytest.mark.parametrize('coordinate, expected_result', [
-            (Coordinate(1, 1), 4), 
-            (Coordinate(4, 2), 104),
-            (Coordinate(7, 6), 64),
-            (Coordinate(3, 8), 4),
-        ])
-
-        def test_evaluate_move(self, board, coordinate, player, expected_result):
-            assert MinMax().evaluate_move(board, coordinate, player) == expected_result  
+        def test_get_relevant_coordinates(self, board):
+            tmp_list = []
+            expected_result = [(2, 2), (2, 3), (2, 4), (2, 5), (2, 6), (2, 7), (3, 3), (3, 4), (3, 5), (3, 6), (4, 2), (4, 3), (4, 6), (4, 7), (5, 3), (5, 4), (5, 5), (5, 6), (6, 2), (6, 3), (6, 4), (6, 5), (6, 6), (6, 7)]
+            for coord in GameAnalyzer.get_marked_surroundings(board):
+                tmp_list.append((coord.row, coord.column))
+            assert sorted(tmp_list) == expected_result
 
     """
+    class TestCalculateMoveScore:
+        @pytest.fixture
+        def board(self):
+            return _create_test_board_large_moves()
+
+        
+        @pytest.mark.parametrize('coordinate, is_first_player, expected_result', [
+            # ["o", "x", "o", " ", " ", "x", " ", "o", " "]
+            (Coordinate(1, 1), True,  4), 
+            # [" ", "o", "o", " ", "o", " ", " ", "x", " "]
+            (Coordinate(4, 2), True, 104),
+            # [" ", " ", " ", " ", "x", "o", " ", " ", " "]
+            (Coordinate(7, 6), True, 64),
+            # [" ", "x", "o", " ", " ", " ", " ", "o", " "]
+            (Coordinate(3, 8), True, 4),
+        ])
+
+        def test_evaluate_move(self, board, coordinate, is_first_player, expected_result):
+            player_mark = 'o'
+            opponent_mark = 'x'
+            assert MinMax().calculate_move_score(board, coordinate, player_mark, opponent_mark, is_first_player) == expected_result  
+
+
     class TestGetSimulatedProhibited:
         @pytest.fixture
         def board(self):
