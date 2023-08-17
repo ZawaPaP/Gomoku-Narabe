@@ -61,5 +61,5 @@ class UserPlayer(Player):
         super().__init__(name, mark)
         self.player_type = PlayerType.USER
     
-    def get_mark_coordinate(self) -> Coordinate:
-        return IOController.get_coordinate_input("Mark (row, column): ")
+    def get_mark_coordinate(self, board) -> Coordinate:
+        return IOController.get_coordinate_input(board, "Mark (row, column): ")

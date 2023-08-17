@@ -18,13 +18,6 @@ class Coordinate:
 
     def __hash__(self):
         return hash((self.row, self.column))
-    
-    def is_in_board(self) -> bool:
-        if self.row in GameBoard.row_range() and self.column in GameBoard.column_range():
-            return True
-        else:
-            raise OutRangeCoordinateError(f"{self.row, self.column}")
-
 
 class GameBoard:
     ROW = 9
@@ -58,6 +51,12 @@ class GameBoard:
     # remove mark from the coordinate
     def remove_mark(self, coordinate: Coordinate):
         self.board[coordinate.row - 1][coordinate.column - 1].mark = GameMark.EMPTY.value
+
+    def is_in_board(self, coordinate: Coordinate) -> bool:
+        if coordinate.row in self.row_range() and coordinate.column in self.column_range():
+            return True
+        else:
+            raise OutRangeCoordinateError()
 
     def is_empty(self) -> bool:
         for i in self.row_range():
