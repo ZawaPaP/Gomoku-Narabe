@@ -6,6 +6,9 @@ Create Gomoku-Narabe, implement the Min-Max logic as CPU playing
 ## Product
 Gomoku-Narabe
 
+## How to play
+WIP
+
 ### prohibited moves
 Gomoku-Narabe has 3 prohibited moves if you're the first player
 3x3, 4x4, overline
