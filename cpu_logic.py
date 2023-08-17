@@ -38,7 +38,6 @@ class DumbCPULogic(CPULogic):
             board.remove_mark(coordinate)
             return coordinate
 
-
 class HighCPULogic(CPULogic):
     def __init__(self, player):
         super().__init__(player)

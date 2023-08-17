@@ -63,4 +63,3 @@ class GameRule:
     @staticmethod
     def is_draw(board) -> bool:
         return board.is_full()
-
