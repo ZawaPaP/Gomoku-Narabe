@@ -1,12 +1,12 @@
 import logging
 import random
-import time
+import copy
 from typing import List, Tuple
 from board import Line, GameBoard, Coordinate
 from game_rule import GameRule
 from game_mark import GameMark
 from game_analyzer import GameAnalyzer
-from collections import deque
+import concurrent.futures
 from abc import ABC, abstractmethod
 
 logging.basicConfig(filename="minmax_metrics.log", level=logging.INFO)
@@ -37,7 +37,6 @@ class DumbCPULogic(CPULogic):
                 continue
             board.remove_mark(coordinate)
             return coordinate
-
 
 class HighCPULogic(CPULogic):
     def __init__(self, player):
@@ -72,6 +71,17 @@ class MinMax():
     def log_depth(self, depth:int):
         logging.info(f"MinMax depth: {depth}")
 
+    def get_future_results(self, board, search_area, player_mark, opponent_mark, is_first_player, alpha, beta, depth):
+        args = [(board, coordinate, player_mark, opponent_mark, is_first_player, alpha, beta, depth, True) for coordinate in search_area]
+        with concurrent.futures.ProcessPoolExecutor(max_workers=4) as executor:
+            results = {}
+            try:
+                for result, coordinate in zip(executor.map(self.min_max_search, *zip(*args)), search_area):
+                    score, _ = result
+                    results[coordinate] = score
+            except Exception as e:
+                print(f'Exception during processing: {e}')
+            return results
 
     def find_best_move(self, board:GameBoard, player_mark: GameMark, opponent_mark: GameMark, is_first_player: bool, depth=MAX_DEPTH):
         # check limit time of minmax search
@@ -83,40 +93,38 @@ class MinMax():
         best_move = None
         
         search_area = self.get_search_areas(board, player_mark, opponent_mark, is_first_player)
-        for coordinate in search_area:
-            #logging.info(f"############################### searching {coordinate.row, coordinate.column}")
-            board.set_mark(coordinate, player_mark)
-            _score, _ = self.min_max_search(board, coordinate, player_mark, opponent_mark, is_first_player, float('-inf'), float('inf'), depth, True)
-            #logging.info(f"find best move - score {coordinate.row, coordinate.column} - {_score}")
-            if _score > best_score:
-                best_score = _score
+        results = self.get_future_results(board, search_area, player_mark, opponent_mark, is_first_player, float('-inf'), float('inf'), depth)
+        
+        for coordinate, score in results.items():
+            if score > best_score:
+                best_score = score
                 best_move = coordinate
-            
-            board.remove_mark(coordinate)
-            
-            """
-            if time.time() - start_time > self.TIME_LIMIT:
-                logging.info(f"Minmax search cut off: {time.time() - start_time}")
-                return (best_move.row, best_move.column)
-            """
         return (best_move.row, best_move.column)
     
         # return score for each simulated coordinate
     def min_max_search(self, board: GameBoard, move:Coordinate, player_mark: GameMark, opponent_mark: GameMark, is_first_player: bool, alpha: int, beta:int, depth: int, my_turn=True) -> Tuple[int, Coordinate]:
-
         if depth == 0 or self.rule.is_over(board, move, player_mark, is_first_player):
             return self.calculate_move_score(board, move, player_mark, opponent_mark, is_first_player), None
-
         if my_turn:
             return self.maximize(board, player_mark, opponent_mark, is_first_player, alpha, beta, depth)
         else:
             return self.minimize(board, player_mark, opponent_mark, is_first_player, alpha, beta, depth)
 
+    """
+    def _min_max_search_wrapper(self, args):
+        board, move, player_mark, opponent_mark, is_first_player, alpha, beta, depth, my_turn = args
+        board_clone = copy.deepcopy(board)
+        if my_turn:
+            board_clone.set_mark(move, opponent_mark) 
+        else:
+            board_clone.set_mark(move, player_mark) 
+        result = self.min_max_search(board_clone, move, player_mark, opponent_mark, is_first_player, alpha, beta, depth, my_turn)
+        return result
+    """
 
     def maximize(self, board: GameBoard, player_mark: GameMark, opponent_mark: GameMark, is_first_player: bool, alpha: int, beta: int, depth: int) -> Tuple[int, int]:
         max_score = float('-inf')
         best_move = None
-        
         search_area = self.get_search_areas(board, player_mark, opponent_mark, is_first_player)
         for coordinate in search_area:
             board.set_mark(coordinate, player_mark)
@@ -127,25 +135,20 @@ class MinMax():
                 max_score = _score
                 best_move = coordinate
             
-            #logging.info(f"max {coordinate.row, coordinate.column} - {_score}, {max_score}")
             alpha = max(alpha, _score)
             if beta <= alpha:
-                #logging.info("alpha beta pruning")
                 break
 
             if max_score == MinMax.WIN_SCORE:
                 break
-
-        # logging.info(f"maximize func {time.time() - _time}")
         return max_score, best_move
-
+        
     def minimize(self, board: GameBoard, player_mark: GameMark, opponent_mark: GameMark, is_first_player: bool, alpha: int, beta: int, depth: int) -> Tuple[int, int]:
         min_score = float('inf')
         best_move = None
-
         search_area = self.get_search_areas(board, player_mark, opponent_mark, is_first_player)
+        
         for coordinate in search_area:
-                
             board.set_mark(coordinate, opponent_mark)
             _score, _ = self.min_max_search(board, coordinate, player_mark, opponent_mark, is_first_player, alpha, beta, depth - 1, True)
             board.remove_mark(coordinate)
@@ -153,15 +156,12 @@ class MinMax():
             if _score < min_score:
                 min_score = _score
                 best_move = coordinate
-            #logging.info(f"min {coordinate.row, coordinate.column} - {_score}, {min_score}")
             beta = min(beta, _score)
             if beta <= alpha:
-                #logging.info("alpha beta pruning")
                 break
         return min_score, best_move
+        
 
-    # 一部コードがLine全体を評価しているため、あくまで医師が置かれた座標を評価するものに変更
-    # Chain4やChain3をさらに詳細分けして、ジャンプがない方が評価が高いようにする
     def calculate_move_score(self, board: GameBoard, coordinate: Coordinate, player_mark: GameMark, opponent_mark: GameMark, is_first_player: bool) -> int:
         _score = 0
         if self.rule.is_prohibited_move(board, coordinate, player_mark, is_first_player):

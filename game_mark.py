@@ -10,4 +10,3 @@ class GameMark(Enum):
         marks = [mark.value for mark in GameMark]
         marks.remove(GameMark.EMPTY.value) # Remove the EMPTY mark from the list
         return marks
-
