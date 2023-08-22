@@ -8,6 +8,8 @@ from game_mark import GameMark
 from game_analyzer import GameAnalyzer
 import concurrent.futures
 from abc import ABC, abstractmethod
+import os
+import threading
 
 logging.basicConfig(filename="minmax_metrics.log", level=logging.INFO)
 
@@ -73,7 +75,7 @@ class MinMax():
 
     def get_future_results(self, board, search_area, player_mark, opponent_mark, is_first_player, alpha, beta, depth):
         args = [(board, coordinate, player_mark, opponent_mark, is_first_player, alpha, beta, depth, True) for coordinate in search_area]
-        with concurrent.futures.ProcessPoolExecutor(max_workers=4) as executor:
+        with concurrent.futures.ProcessPoolExecutor() as executor:
             results = {}
             try:
                 for result, coordinate in zip(executor.map(self.min_max_search, *zip(*args)), search_area):
@@ -84,8 +86,6 @@ class MinMax():
             return results
 
     def find_best_move(self, board:GameBoard, player_mark: GameMark, opponent_mark: GameMark, is_first_player: bool, depth=MAX_DEPTH):
-        # check limit time of minmax search
-        # start_time = time.time()
         if board.is_empty():
             return ((board.row() + 1 )// 2, (board.column() + 1) // 2)
         
@@ -93,12 +93,13 @@ class MinMax():
         best_move = None
         
         search_area = self.get_search_areas(board, player_mark, opponent_mark, is_first_player)
+        #for move in search_area:
+        #    score, _ = self.min_max_search(board, move, player_mark, opponent_mark, is_first_player, float('-inf'), float('inf'), depth, True)
         results = self.get_future_results(board, search_area, player_mark, opponent_mark, is_first_player, float('-inf'), float('inf'), depth)
-        
-        for coordinate, score in results.items():
+        for move, score in results.items():
             if score > best_score:
                 best_score = score
-                best_move = coordinate
+                best_move = move
         return (best_move.row, best_move.column)
     
         # return score for each simulated coordinate
@@ -121,7 +122,7 @@ class MinMax():
         result = self.min_max_search(board_clone, move, player_mark, opponent_mark, is_first_player, alpha, beta, depth, my_turn)
         return result
     """
-
+        
     def maximize(self, board: GameBoard, player_mark: GameMark, opponent_mark: GameMark, is_first_player: bool, alpha: int, beta: int, depth: int) -> Tuple[int, int]:
         max_score = float('-inf')
         best_move = None
@@ -160,7 +161,6 @@ class MinMax():
             if beta <= alpha:
                 break
         return min_score, best_move
-        
 
     def calculate_move_score(self, board: GameBoard, coordinate: Coordinate, player_mark: GameMark, opponent_mark: GameMark, is_first_player: bool) -> int:
         _score = 0
