@@ -2,11 +2,25 @@ import re
 from typing import Tuple
 from error import InvalidIntInputError, OutRangeCoordinateError
 from board import Coordinate
+from socket_io import SocketServer
 
 class InputOutput:
+    server = None
+    
     @staticmethod
     def get_input(prompt: str) -> str:
         return input(prompt)
+    
+    @staticmethod
+    def initialize_server():
+        if not InputOutput.server:
+            InputOutput.server = SocketServer()
+            InputOutput.server.run()
+    
+    @staticmethod
+    def get_socket_input(prompt: str) -> str:
+        InputOutput.server.send_message(prompt)
+        return InputOutput.server.receive_message()
 
 class IOController:
     @staticmethod
@@ -22,7 +36,7 @@ class IOController:
     def get_coordinate_input(board, prompt: str) -> Coordinate:
         while True:
             try:
-                user_input = InputOutput.get_input(prompt)
+                user_input = InputOutput.get_socket_input(prompt)
                 parsed_input = IOController.parse_input(user_input)
                 if IOController.validate_input(parsed_input):
                     row, column = map(int, parsed_input.split(","))

@@ -16,6 +16,7 @@ class PlayerManager:
         self.current_player_index = 0
     
 
+    '''
     # for testing only 
     def set_players(self):
         name = f"{PlayerType.CPU.name}_Random"
@@ -56,7 +57,7 @@ class PlayerManager:
         for i, player in enumerate(self.players):
             player.order = i + 1
             player.opponent = self.players[(i + 1) % self.number_of_players]
-    '''
+
 
     def get_current_player(self) -> Player:
         return self.players[self.current_player_index % self.number_of_players]

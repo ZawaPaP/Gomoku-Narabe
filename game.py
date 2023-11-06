@@ -5,7 +5,7 @@ from player_manager import PlayerManager
 from game_rule import GameRule
 from game_mode import GameMode
 from game_analyzer import GameAnalyzer
-from io_controller import IOController
+from io_controller import IOController, InputOutput
 
 class Game:
     def __init__(self) -> None:
@@ -15,6 +15,7 @@ class Game:
         self.rule = GameRule()
 
     def play(self):
+        InputOutput.initialize_server()
         self.player_manager.set_players()
         self.display_initial_text()
         while True:
